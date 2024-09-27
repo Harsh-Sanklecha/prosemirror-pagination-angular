@@ -1,0 +1,52 @@
+::ng-deep {
+    .ProseMirror {
+        width: 210mm;
+        margin-inline: auto;
+        outline: none;
+    }
+    
+    .page {
+        border: 1px solid #ccc;
+        background-color: #fff;
+        padding: 20mm;
+        /* Ensure each page has 20mm padding */
+        margin: 0 auto;
+        height: 97mm;
+        width: 210mm;
+        padding-inline: 20px;
+        padding-block: 60px;
+        margin-inline: auto;
+        margin-block: 1rem;
+        /* Page height */
+        box-sizing: border-box;
+        overflow-y: scroll;
+        page-break-after: always;
+        position: relative;
+    }
+
+    div.ProseMirror p {
+        margin: 0;
+        padding: 0 0 1em;
+    }
+
+    div.ProseMirror div.header,
+    div.ProseMirror div.footer {
+        position: absolute;
+        width: 100%;
+        text-align: center;
+        left: 0;
+        height: 60px;
+        overflow-y: scroll;
+    }
+
+    div.ProseMirror div.header {
+        top: 0;
+    }
+
+    div.ProseMirror div.footer {
+        bottom: 0;
+    }
+
+    div.ProseMirror div.content {
+    }
+}
