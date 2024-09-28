@@ -1,0 +1,161 @@
+<p-confirmDialog #cd>
+    <ng-template pTemplate="headless" let-message>
+        <div class="flex flex-row justify-between items-center px-4 py-2">
+            <span class="text-lg font-medium text-gray-500 ">Confirmation</span>
+            <p-button (onClick)="cd.hide()" styleClass="mr-5"><i class="pi pi-times"></i></p-button>
+        </div>
+        <div class="flex flex-col align-items-center p-5 surface-overlay border-round w-[30rem]">
+            <span class="font-bold text-2xl block mb-2">
+                {{ message.header }}
+            </span>
+
+            <p class="mb-0">{{ message.message }}</p>
+
+            <div class="flex justify-end items-end float-left gap-2 mt-4">
+
+                <p-button label="Approve" (onClick)="cd.accept()"
+                    styleClass="bg-white rounded-xl border border-green-500 text-green-500 hover:bg-green-100 hover:text-green-500 px-4 py-2 "
+                    icon="pi pi-check"></p-button>
+
+                <p-button label="Reject" (onClick)="cd.reject()"
+                    styleClass="bg-white rounded-xl border border-red-500 text-red-500 hover:bg-red-100 hover:text-red-500 px-4 py-2 "
+                    icon="pi pi-times"></p-button>
+            </div>
+        </div>
+    </ng-template>
+</p-confirmDialog>
+
+<p-sidebar [visible]="toggleTOC" [position]="'right'" styleClass="bg-white">
+    <div class="flex flex-col h-full bg-white">
+        <ng-container *ngFor="let heading of headings; let i = index">
+            <p *ngIf="heading.level === 1" class="heading text-truncate text-base cursor-pointer hover:bg-gray-100 p-2"
+                (click)="scrollTO(heading)">
+                {{heading.label}}
+            </p>
+            <p *ngIf="heading.level !== 1"
+                class="subheading text-truncate cursor-pointer text-sm hover:bg-gray-100 p-2 pl-4"
+                (click)="scrollTO(heading)">
+                - {{heading.label}}
+            </p>
+        </ng-container>
+    </div>
+</p-sidebar>
+
+
+<div class="h-full contract-editor">
+    <!-- Custom Menu -->
+    <div class="custom-menu p-3 gap-3">
+        <div>
+            <p-button styleClass="custom-menu-item" (onClick)="toggleTOC = !toggleTOC">
+                <span class="m-1 material-icons">list</span>
+            </p-button>
+            <p-button styleClass="custom-menu-item" (onClick)="addPage()">
+                <span class="m-1 material-icons">add</span>
+            </p-button>
+        </div>
+        <div class="section flex gap-1">
+            <p-button styleClass="custom-menu-item" (onClick)="undo()">
+                <span class="m-1 material-icons">undo</span>
+            </p-button>
+            <p-button styleClass="custom-menu-item" (onClick)="redo()">
+                <span class="m-1 material-icons">redo</span>
+            </p-button>
+        </div>
+        <div class="section flex gap-1">
+            <p-button (click)="applyStyle(MARKS.BOLD)"
+                [styleClass]="activeMarks()[MARKS.BOLD] ? 'active-custom-menu-item' : 'custom-menu-item'">
+                <span class="m-1 material-icons">format_bold</span>
+            </p-button>
+            <p-button (click)="applyStyle(MARKS.ITALIC)"
+                [styleClass]="activeMarks()[MARKS.ITALIC] ? 'active-custom-menu-item' : 'custom-menu-item'">
+                <span class="m-1 material-icons">format_italic</span>
+            </p-button>
+            <p-button (click)="applyStyle(MARKS.STRIKETHROUGH)"
+                [styleClass]="activeMarks()[MARKS.STRIKETHROUGH] ? 'active-custom-menu-item' : 'custom-menu-item'">
+                <span class="m-1 material-icons">strikethrough_s</span>
+            </p-button>
+            <p-button (click)="applyStyle(MARKS.UNDERLINE)"
+                [styleClass]="activeMarks()[MARKS.UNDERLINE] ? 'active-custom-menu-item' : 'custom-menu-item'">
+                <span class="m-1 material-icons">format_underline</span>
+            </p-button>
+        </div>
+        <div class="section flex gap-1">
+            <p-dropdown [options]="headingOptions" [(ngModel)]="activeHeading"
+                (onChange)="applyHeading($event.value.code)" optionLabel="name" />
+        </div>
+
+        <div class="section flex gap-1">
+            <p-button (onClick)="applyStyle('align-left')"
+                [styleClass]="activeMarks()['align_left'] ? 'active-custom-menu-item' : 'custom-menu-item'">
+                <span class="m-1 material-icons">format_align_left</span>
+            </p-button>
+            <p-button (onClick)="applyStyle('align-center')"
+                [styleClass]="activeMarks()['align_center'] ? 'active-custom-menu-item' : 'custom-menu-item'">
+                <span class="m-1 material-icons">format_align_center</span>
+            </p-button>
+            <p-button (onClick)="applyStyle('align-right')"
+                [styleClass]="activeMarks()['align_right'] ? 'active-custom-menu-item' : 'custom-menu-item'">
+                <span class="m-1 material-icons">format_align_right</span>
+            </p-button>
+            <p-button (onClick)="applyStyle('align-justify')"
+                [styleClass]="activeMarks()['align_justify'] ? 'active-custom-menu-item' : 'custom-menu-item'">
+                <span class="m-1 material-icons">format_align_justify</span>
+            </p-button>
+        </div>
+        <div class="section flex gap-2">
+            <p-button styleClass="custom-menu-item" (onClick)="applyStyle('bullet-list')"
+                [styleClass]="activeMarks()['bullet_list'] ? 'active-custom-menu-item' : 'custom-menu-item'">
+                <span class="m-1 material-icons">format_list_bulleted</span>
+            </p-button>
+            <p-button styleClass="custom-menu-item" (onClick)="applyStyle('ordered-list')"
+                [styleClass]="activeMarks()['ordered_list'] ? 'active-custom-menu-item' : 'custom-menu-item'">
+                <span class="m-1 material-icons">format_list_numbered</span>
+            </p-button>
+            <p-button styleClass="custom-menu-item" (onClick)="applyStyle('blockquote')"
+                [styleClass]="activeMarks()['blockquote'] ? 'active-custom-menu-item' : 'custom-menu-item'">
+                <span class="m-1 material-icons">format_quote</span>
+            </p-button>
+        </div>
+        <div class="section flex gap-2">
+            <p-button styleClass="custom-menu-item" (onClick)="applyStyle('page_break')"
+                [styleClass]="activeMarks()['page_break'] ? 'active-custom-menu-item' : 'custom-menu-item'">
+                <span class="m-1 pi pi-minus"></span>
+            </p-button>
+        </div>
+        <!-- <div class="section flex gap-1">
+            <p-menubar [model]="tableMenu" />
+        </div> -->
+
+    </div>
+
+    <!-- Editor Section -->
+    <div class="editor-container w-3/4 h-full" #editorContainer>
+        <div #overlayMenu class="overlay-menu flex gap-4" [style.display]="showOverlay ? 'block' : 'none'"
+            [style.top.px]="overlayTop" [style.left.px]="overlayLeft" (clickOutside)="showOverlay = false">
+            <p-button (click)="showCommentBox()" styleClass="custom-menu-item">
+                <span class="m-1 material-icons-outlined">add_comment</span>
+            </p-button>
+            <p-button (click)="generate()" styleClass="custom-menu-item">
+                <span class="m-1 material-icons-outlined">smart_toy</span>
+            </p-button>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Drag handle for selected content -->
+<div #dragHand draggable=" true" data-drag-handle="" class="drag-handle"
+    [style.display]=" dragHand && showOverlay  ? 'block' : 'none'" [style.top.px]="dragHandTop"
+    [style.left.px]="dragHandLeft">
+    <div class="drag-handle-container">
+        <div class="drag-handle-dots">
+            <span class="drag-handle-dot"></span>
+            <span class="drag-handle-dot"></span>
+            <span class="drag-handle-dot"></span>
+            <span class="drag-handle-dot"></span>
+            <span class="drag-handle-dot"></span>
+            <span class="drag-handle-dot"></span>
+        </div>
+    </div>
+</div>
