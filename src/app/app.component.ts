@@ -17,7 +17,7 @@ const mySchema = new Schema({
       content: "page+"
     },
     page: {
-      content: "header content footer",
+      content: "content",
       toDOM() { return ["div", { class: "page" }, 0]; },
       parseDOM: [{ tag: "div.page" }]
     },
